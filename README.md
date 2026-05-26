@@ -27,3 +27,5 @@ RDPKeepAlive.exe [/v]
 ## Basics
 
  ![Animated GIF for usage](./assets/animation.gif)
+
+build
