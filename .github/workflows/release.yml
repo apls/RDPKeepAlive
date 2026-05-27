@@ -19,17 +19,15 @@ jobs:
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
-      
-    - name: Download .NET 4.0 Reference Assemblies via NuGet
-      run: |
-        nuget install Microsoft.NETFramework.ReferenceAssemblies.net40 -Version 1.0.3 -OutputDirectory D:\a\frameworks
 
-    - name: Build Solution
-      run: |
-        msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build /p:TargetFrameworkRootPath=D:\a\frameworks\Microsoft.NETFramework.ReferenceAssemblies.net40.1.0.3\build\.NETFramework\
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet Packages
+      run: nuget restore src\RDPKeepAlive.sln
   
-#    - name: Build solution
-#      run: msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build
+    - name: Build solution
+      run: msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build
 
     - name: Remove PDB files
       run: del /Q src\RDPKeepAlive\bin\Release\*.pdb 2>nul
