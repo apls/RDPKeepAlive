@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace RDPKeepAlive
@@ -15,14 +15,17 @@ namespace RDPKeepAlive
         ///     The item to find.
         /// </param>
         /// <param name="stringComparison">
-        ///     The string comparison to use. OrdinalIgnoreCase by defaults
+        ///     The string comparison to use. OrdinalIgnoreCase by default.
         /// </param>
         /// <returns>
         ///     True if the item is found; otherwise, false.
         /// </returns>
         public static bool Contains(this IEnumerable<string> collection, string item, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
         {
-            ArgumentNullException.ThrowIfNull(collection);
+            if (collection == null)
+            {
+                throw new ArgumentNullException("collection");
+            }
 
             if (!string.IsNullOrEmpty(item))
             {
