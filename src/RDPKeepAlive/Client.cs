@@ -1,9 +1,8 @@
-﻿namespace RDPKeepAlive
+namespace RDPKeepAlive
 {
-    internal struct Client
+    internal class Client
     {
         public string ClassName;
-
         public string WindowTitle;
     }
 }
