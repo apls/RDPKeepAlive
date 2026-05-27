@@ -69,6 +69,7 @@ namespace RDPKeepAlive
 
             if (TryGetWindowClass(hWnd, out className) && TryGetWindowTitle(hWnd, out windowTitle))
             {
+				Console.WriteLine(className);
                 bool isRdpClient = false;
                 foreach (string rdpClass in RdpClients)
                 {
