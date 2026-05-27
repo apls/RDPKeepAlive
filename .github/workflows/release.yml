@@ -27,27 +27,31 @@ jobs:
 
     # Build with MSBuild (.NET Framework 4.0)
     - name: Build solution
-      run: msbuild $env:Solution_Name /p:Configuration=Release /p:OutputPath=..\..\publish\ /t:Build
+      shell: pwsh
+      run: |
+        $env:MSBUILD_PATH = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+        & $env:MSBUILD_PATH $env:Solution_Name /p:Configuration=Release
 
-    # Remove PDB files from release
+    # Remove PDB files
     - name: Remove PDB files
-      run: Remove-Item .\publish\*.pdb -ErrorAction SilentlyContinue
+      shell: pwsh
+      run: Remove-Item .\src\RDPKeepAlive\bin\Release\*.pdb -ErrorAction SilentlyContinue
 
     # List output
     - name: List output files
       shell: pwsh
-      run: Get-ChildItem .\publish\
+      run: Get-ChildItem .\src\RDPKeepAlive\bin\Release\
 
     # Upload artifact
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: RDPKeepAlive
-        path: .\publish\RDPKeepAlive.exe
+        path: .\src\RDPKeepAlive\bin\Release\RDPKeepAlive.exe
 
     # Release
     - name: Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
-        files: publish/RDPKeepAlive.exe
+        files: src/RDPKeepAlive/bin/Release/RDPKeepAlive.exe
