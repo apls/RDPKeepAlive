@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace RDPKeepAlive
@@ -7,11 +7,8 @@ namespace RDPKeepAlive
     internal struct Rect : IEquatable<Rect>
     {
         internal int Left { get; set; }
-
         internal int Top { get; set; }
-
         internal int Right { get; set; }
-
         internal int Bottom { get; set; }
 
         public Rect(int left, int top, int width, int height)
@@ -24,7 +21,7 @@ namespace RDPKeepAlive
 
         public override string ToString()
         {
-            return $"{Left},{Top},{Right},{Bottom}";
+            return string.Format("{0},{1},{2},{3}", Left, Top, Right, Bottom);
         }
 
         public bool Equals(Rect other)
@@ -32,14 +29,22 @@ namespace RDPKeepAlive
             return Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
         }
 
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             return obj is Rect other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Left, Top, Right, Bottom);
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + Left.GetHashCode();
+                hash = hash * 31 + Top.GetHashCode();
+                hash = hash * 31 + Right.GetHashCode();
+                hash = hash * 31 + Bottom.GetHashCode();
+                return hash;
+            }
         }
 
         public static bool operator ==(Rect left, Rect right)
