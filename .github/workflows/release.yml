@@ -19,7 +19,10 @@ jobs:
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
-
+      
+    - name: Install .NET Framework 4.0 Developer Pack
+      run: choco install netfx-4.0-devpack -y
+  
     - name: Build solution
       run: msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build
 
