@@ -21,7 +21,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Build solution
-      run: msbuild RDPKeepAlive.sln /p:Configuration=Release /t:Build
+      run: msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build
 
     - name: Remove PDB files
       run: del /Q src\RDPKeepAlive\bin\Release\*.pdb 2>nul
