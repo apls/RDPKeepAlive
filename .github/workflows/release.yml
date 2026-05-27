@@ -9,48 +9,36 @@ on:
 jobs:
 
   build:
-
-    strategy:
-      matrix:
-        configuration: [Release]
-
     runs-on: windows-latest
-
-    env:
-      Solution_Name: RDPKeepAlive.sln
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        
+
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
-  
-    # Build with MSBuild (.NET Framework 4.0)
+
     - name: Build solution
-      run: msbuild $env:Solution_Name /p:Configuration=Release /p:OutputPath=..\..\publish\ /t:Build
+      run: msbuild RDPKeepAlive.sln /p:Configuration=Release /t:Build
 
-    # Remove PDB files from release
     - name: Remove PDB files
-      run: Remove-Item .\publish\*.pdb -ErrorAction SilentlyContinue
+      run: del /Q src\RDPKeepAlive\bin\Release\*.pdb 2>nul
+      shell: cmd
 
-    # List output
     - name: List output files
-      shell: pwsh
-      run: Get-ChildItem .\publish\
+      run: dir src\RDPKeepAlive\bin\Release\
+      shell: cmd
 
-    # Upload artifact
-    - name: Upload a Build Artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: RDPKeepAlive
-        path: .\publish\RDPKeepAlive.exe
+        path: src\RDPKeepAlive\bin\Release\RDPKeepAlive.exe
 
-    # Release
     - name: Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
-        files: publish/RDPKeepAlive.exe
+        files: src/RDPKeepAlive/bin/Release/RDPKeepAlive.exe
