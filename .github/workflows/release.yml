@@ -25,9 +25,9 @@ jobs:
 
     - name: Restore NuGet Packages
       run: nuget restore src\RDPKeepAlive.sln
-  
+      
     - name: Build solution
-      run: msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build
+      run: msbuild src\RDPKeepAlive.sln /p:Configuration=Release /t:Build /p:LangVersion=latest
 
     - name: Remove PDB files
       run: del /Q src\RDPKeepAlive\bin\Release\*.pdb 2>nul
