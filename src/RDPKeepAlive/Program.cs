@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading;
 
@@ -12,78 +12,77 @@ namespace RDPKeepAlive
 
         public static void Main(string[] args)
         {
-            using Mutex mutex = new Mutex(false, MutexName);
-            if (!mutex.WaitOne(0))
+            using (Mutex mutex = new Mutex(false, MutexName))
             {
-                Console.WriteLine("2nd instance");
-                ExitGracefully();
-            }
-
-            if (args.Length > 0 && args[0].Equals("-v"))
-            {
-                _verbose = true;
-            }
-
-            // Ensure console can display Unicode characters
-            Console.OutputEncoding = Encoding.UTF8;
-
-            // Subscribe to Ctrl+C handling
-            Console.CancelKeyPress += OnCancelKeyPress;
-
-            // Display startup messages
-            Console.WriteLine("RDPKeepAlive - Zafer Balkan, (c) 2025");
-            Console.WriteLine("Simulating RDP activity.");
-            Console.WriteLine("Press CTRL+C to stop...\n");
-
-            // Main Loop: Enumerate windows and simulate activity Loop is terminated by the
-            // interrupt thread The for loop inside provides the near-60-second cycles
-            while (true)
-            {
-                // This value is set every 60 seconds.
-                var previousValue = false;
-
-                // Check for RDP client windows every second
-                for (var i = 0; i < Interval; i++)
+                if (!mutex.WaitOne(0))
                 {
-                    var isFound = KeepAlive.TryGetRDPClient(out var client);
+                    Console.WriteLine("2nd instance");
+                    ExitGracefully();
+                }
 
-                    if (!isFound)
+                if (args.Length > 0 && args[0].Equals("-v"))
+                {
+                    _verbose = true;
+                }
+
+                Console.OutputEncoding = Encoding.UTF8;
+
+                Console.CancelKeyPress += OnCancelKeyPress;
+
+                Console.WriteLine("RDPKeepAlive - Zafer Balkan, (c) 2025");
+                Console.WriteLine("Simulating RDP activity.");
+                Console.WriteLine("Press CTRL+C to stop...");
+                Console.WriteLine();
+
+                while (true)
+                {
+                    bool previousValue = false;
+
+                    for (int i = 0; i < Interval; i++)
                     {
-                        Console.WriteLine("No RDP client found. Exiting...");
-                        ExitGracefully();
+                        Client client;
+                        bool isFound = KeepAlive.TryGetRDPClient(out client);
+
+                        if (!isFound)
+                        {
+                            Console.WriteLine("No RDP client found. Exiting...");
+                            ExitGracefully();
+                        }
+
+                        if (!previousValue)
+                        {
+                            previousValue = isFound;
+
+                            if (_verbose)
+                            {
+                                Console.WriteLine(string.Format("{0:o} - Found RDP client.", DateTime.Now));
+                                Console.WriteLine(string.Format("\t* Window: {0}", client.WindowTitle));
+                                Console.WriteLine(string.Format("\t* Class : {0}", client.ClassName));
+                            }
+
+                            KeepAlive.Execute();
+
+                            if (_verbose)
+                            {
+                                Console.WriteLine(string.Format("{0:o} - Mouse movement is sent.", DateTime.Now));
+                            }
+                        }
+
+                        Thread.Sleep(1000);
                     }
-
-                    if (previousValue)
-                    { // we already printed once we have found. Do nothing.
-                    }
-                    else
-                    {
-                        previousValue = isFound;
-                        if (_verbose)
-                            Console.WriteLine($"{DateTime.Now:o} - Found RDP client.\n\t* Window: {client.WindowTitle}\n\t* Class : {client.ClassName}");
-
-                        // Perform mouse movement simulation if RDP client exists
-                        KeepAlive.Execute();
-
-                        if (_verbose)
-                            Console.WriteLine($"{DateTime.Now:o} - Mouse movement is sent.");
-                    }
-
-                    Thread.Sleep(1000); // Sleep for 1 second
                 }
             }
         }
 
         private static void ExitGracefully()
         {
-            // Add cleanup code here when needed
             Console.WriteLine("RDPKeepAlive terminated gracefully.");
             Environment.Exit(0);
         }
 
-        private static void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
+        private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            e.Cancel = true; // Prevent immediate termination
+            e.Cancel = true;
             ExitGracefully();
         }
     }
